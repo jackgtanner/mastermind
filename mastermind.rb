@@ -22,6 +22,7 @@ class Player
     def initialize(name)
         @name = name
     end
+
 end
 
 class Board
@@ -45,11 +46,10 @@ class Board
                 @secret_code[index] = "P"
             end
         }      
-
     end
 
     def is_choice_valid(guess)
-        @guess = guess.map(&:upcase)
+        @guess = guess
         until (@guess.length === 4) && (@guess.any? { |i| ["B", "b", "Y", "y", "G", "g", "W", "w", "R", "r", "P", "p"].include? i })
             unless @guess.length === 4
                 puts "Sorry, the code is made up of 4 colors, try again with that amount"
@@ -62,55 +62,45 @@ class Board
                 @guess = @player_guess.split("")
             end
         end
+        @guess = @guess.map!(&:upcase)
         return true
     end
 
     def get_hints
         @hint = []
-        p @temp_guess = @guess
-        # p @guess
-        # p @secret_code
+        guess_copy = Array.new()
+        code_copy = Array.new()
+        @guess
+        @secret_code
 
         for i in 0..3 # check for correct colors in correct positions
-            if @guess[i] === @secret_code[i]
+            if @guess[i] == @secret_code[i]
                 @hint.push("W")
-                @temp_guess.delete_at(i)
-
             end
-
+            unless @guess[i] == @secret_code[i]
+                guess_copy.push(@guess[i])
+                code_copy.push(@secret_code[i])
+            end
         end
-        p @temp_guess
 
-        for i in 0..@temp_guess.length
-            if @temp_guess[i].include?(@secret_code)
+        for i in 0..(guess_copy.length-1)
+            if (code_copy).include?(guess_copy[i])
                 @hint.push("B")
+            else
+                @hint.push("_")
             end
         end
-
-
-
-      
-
-
-
-
-
-
     end
 
     def show_board()
         puts "---------"
         puts "-#{@guess[0]}-#{@guess[1]}-#{@guess[2]}-#{@guess[3]}-|| Hints: -#{@hint[0]}.#{@hint[1]}.#{@hint[2]}.#{@hint[3]}-"
         puts "---------\n\n"
-        puts "(W in hints means you have a color which is correct & in the correct position"
-        puts "and B means there is a correct color but not in the correct position"
-        puts "'_' means that there is a color which is wrong)\n\n"
-
     end
 
     def show_code
         puts "---------"
-        puts "-#{@secret_code[0]}-#{@secret_code[1]}-#{@secret_code[2]}-#{@secret_code[3]}-||- . . . -"
+        puts "-#{@secret_code[0]}-#{@secret_code[1]}-#{@secret_code[2]}-#{@secret_code[3]}-"
         puts "---------"
     end
 
@@ -121,8 +111,6 @@ class Board
             return false
         end        
     end
-
-
 end
 
 
@@ -132,29 +120,30 @@ class Game
         puts "\nBefore explainging the rules, what's your name?\n\n"
         @player = Player.new(gets.chomp) 
         puts "\nWelcome #{@player.name}!\n\n"
-        # sleep (1)
-        # puts "In the game Mastermind, you will have 12 Turns to work out a color code which is set by the computer.\n\n"
-        # sleep (3)
-        # puts "The code is made up of 4 colors, you have to guess the colors, and the correct position of them. The colors can be repeated\n\n"
-        # sleep (3)
-        # puts "After each turn, the computer will give you a hint as to how close you are to getting the secret code correct.\n\n"
-        # sleep (3)
-        # puts "For each correct color, the computer will give you a Blue letter, for each color that is also in the correct position, the letter will be White\n\n"
-        # sleep (3)
-        # puts "If there are no correct guesses, the computer will not give you a letter and it will remain blank.\n\n"
-        # sleep (3)
-
-
+        sleep (1)
+        puts "In the game Mastermind, you will have 12 Turns to work out a color code which is set by the computer.\n\n"
+        sleep (3)
+        puts "The code is made up of 4 colors, you have to guess the colors, and the correct position of them. The colors can be repeated\n\n"
+        sleep (3)
+        puts "After each turn, the computer will give you a hint as to how close you are to getting the secret code correct.\n\n"
+        sleep (3)
+        puts "For each correct color, the computer will give you a Blue letter, for each color that is also in the correct position, the letter will be White\n\n"
+        sleep (3)
+        puts "If there are no correct guesses, the computer will not give you a letter and it will remain blank.\n\n"
+        sleep (3)
     end
 
     def play
         puts "Lets get started!\n\n"
+        puts "(W in hints means you have a color which is correct & in the correct position"
+        puts "and B means there is a correct color but not in the correct position"
+        puts "'_' means that there is a color which is wrong)\n\n"
+        
         @moves = 0
         @colors = ["B", "b", "Y", "y", "G", "g", "W", "w", "R", "r", "P", "p"]
         @board = Board.new
-
-
         @game_over = false
+
         until @game_over
             puts "Type in 4 of the colors to make your guess:"
             puts "Blue = B, Yellow = Y, Green = G, White = W, Red = R, Purple = P\n\n"
@@ -175,32 +164,31 @@ class Game
 
             #Loop until game is won or moves === 12
             @moves += 1
+            puts "You have #{12 - @moves} moves left\n\n"
             if @board.game_won?
                 puts "WooHoo!!!"
-                puts "\n\nCongrats! You've guessed the code & won!!\n\n"
+                puts "\n\nCongrats #{@player.name}! You've guessed the code & won!!\n\n"
                 @game_over = true
             elsif @moves === 12
                 @game_over = true
-                puts "\n\nGame Over....."
-                puts "Unlucky, you didn't manage to guess the code within 12 Moves :(\n\n\n"
+                puts "\n\nGame Over..... the secret code was:"
+                @board.show_code
+                puts "Unlucky #{@player.name}, you didn't manage to guess the code within 12 Moves :(\n\n\n"
             end
         end
     end
 end
 
 
-#     mastermind = Game.new()
-# until play_again === "No"
-#     mastermind.play
-#     puts 'Play again? Type Yes or No'
-#     play_again = gets.chomp
-#   until ['Yes', 'No'].include?(play_again)
-#     puts 'Invalid input. Type Yes or No'
-#     play_again = gets.chomp
-#   end
-# end
-
-
-mastermind = Game.new()
-mastermind.play
-
+    mastermind = Game.new()
+    play_again = ""
+until play_again === "No"
+    mastermind.play
+    puts 'Play again? Type Yes or No'
+    play_again = gets.chomp
+  until ['Yes', 'No'].include?(play_again)
+    puts 'Invalid input. Type Yes or No'
+    play_again = gets.chomp
+  end
+end
+puts "See you next time\n\n"
