@@ -1,0 +1,1 @@
+<div>This is my attempt at making the game Mastermind within the console, this is the second project in Ruby from <a href='https://www.theodinproject.com/lessons/mastermind'>The Odin Project</a></div><div>The full list of rules and details of the game can be found here on the <a href='http://en.wikipedia.org/wiki/Mastermind_(board_game)'>Wikipedia page</a> about the game.</div>
